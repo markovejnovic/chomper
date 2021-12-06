@@ -1,0 +1,6 @@
+intel-tensorflow==2.7.0
+keras
+numpy
+matplotlib
+pillow
+pydot
