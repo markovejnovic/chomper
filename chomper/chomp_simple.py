@@ -67,8 +67,6 @@ if __name__ == '__main__':
     dims = (tf.shape(xtrain_dft)[0], tf.shape(xtrain)[1]**2)
     norm_xtrain_dft = keras.utils.normalize(xtrain_dft)
     norm_xtest_dft = keras.utils.normalize(xtest_dft)
-    log.info(f'The shape of the flattened DFT is {xtrain_dft.shape}, ' +
-             f'testing: {xtest_dft.shape}')
 
     dft_model, dft_history = get_trained_model(norm_xtrain_dft, ytrain)
 

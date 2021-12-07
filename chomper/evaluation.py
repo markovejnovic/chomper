@@ -3,6 +3,7 @@ import os
 import numpy as np
 from PIL import Image, ImageOps
 import log
+import image
 
 def evaluate_model(model, datapath):
     to_predict = []
@@ -15,6 +16,7 @@ def evaluate_model(model, datapath):
         expected.append(exp)
 
         img = np.array(ImageOps.invert(Image.open(path).convert('L')))
+        cropped = image.resize_to_fit(image.autocrop(img), (28, 28))
         to_predict.append(img)
 
     log.info(f'Shape out custom test data: {np.array(to_predict).shape}')
@@ -30,4 +32,4 @@ def evaluate_model(model, datapath):
 
     count = len(to_predict)
     log.info(f'Total Accuracy: {round(accuracy_accum / count, 2)}. ' +
-             f'Avg Confidence: {round(confidence_accum / count)}\n')
+             f'Avg Confidence: {round(confidence_accum / count, 2)}\n')

@@ -12,13 +12,18 @@ import log
 
 
 @cached
-def get_ultra_deep_trained_model(norm_xtrain: Union[np.ndarray, tf.Tensor],
+def get_conv_simple_trained_model(norm_xtrain: Union[np.ndarray, tf.Tensor],
         ytrain: Union[np.ndarray, tf.Tensor]) -> keras.Model:
     model = keras.Sequential([
-        keras.layers.Flatten(input_shape=(norm_xtrain.shape[1],
+        keras.layers.Reshape((norm_xtrain.shape[1], norm_xtrain.shape[2], 1),
+                             input_shape=(norm_xtrain.shape[1],
                                           norm_xtrain.shape[2])),
-        keras.layers.Dense(50, activation='relu'),
-        keras.layers.Dense(100, activation='relu'),
+        keras.layers.Conv2D(filters=32, kernel_size=3, padding='same',
+                            activation='relu',
+                            input_shape=(norm_xtrain.shape[1],
+                                         norm_xtrain.shape[2], 1)),
+        keras.layers.MaxPooling2D(pool_size=3),
+        keras.layers.Flatten(),
         keras.layers.Dense(10, activation='sigmoid')
     ])
 
@@ -30,7 +35,7 @@ def get_ultra_deep_trained_model(norm_xtrain: Union[np.ndarray, tf.Tensor],
 
     history = model.fit(norm_xtrain, ytrain, epochs=5)
 
-    keras.utils.plot_model(model, to_file=f'output/chomp_ultra_deep.model.png')
+    keras.utils.plot_model(model, to_file=f'output/chomp_conv_simple.model.png')
 
     return model, history
 
@@ -50,7 +55,7 @@ if __name__ == '__main__':
     norm_xtrain = keras.utils.normalize(xtrain)
     norm_xtest = keras.utils.normalize(xtest)
 
-    model, history = get_ultra_deep_trained_model(norm_xtrain, ytrain)
+    model, history = get_conv_simple_trained_model(norm_xtrain, ytrain)
 
     # Test
     log.info('Testing with the MNIST test data:')
@@ -69,7 +74,8 @@ if __name__ == '__main__':
     norm_xtrain_dft = keras.utils.normalize(xtrain_dft)
     norm_xtest_dft = keras.utils.normalize(xtest_dft)
 
-    dft_model, dft_history = get_ultra_deep_trained_model(norm_xtrain_dft, ytrain)
+    dft_model, dft_history = get_conv_simple_trained_model(norm_xtrain_dft,
+                                                           ytrain)
 
     log.info('Testing DFT with the MNIST test data:')
     loss, accuracy = dft_model.evaluate(norm_xtest_dft, ytest)
